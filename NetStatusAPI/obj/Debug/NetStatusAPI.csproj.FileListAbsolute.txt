@@ -1,0 +1,5 @@
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusAPI\bin\Debug\NetStatusAPI.dll
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusAPI\bin\Debug\NetStatusAPI.pdb
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusAPI\obj\Debug\NetStatusAPI.csproj.CoreCompileInputs.cache
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusAPI\obj\Debug\NetStatusAPI.dll
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusAPI\obj\Debug\NetStatusAPI.pdb

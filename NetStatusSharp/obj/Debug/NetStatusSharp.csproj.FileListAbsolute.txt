@@ -1,0 +1,12 @@
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\bin\Debug\NetStatusSharp.exe.config
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\bin\Debug\NetStatusSharp.exe
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\bin\Debug\NetStatusSharp.pdb
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\bin\Debug\NetStatusAPI.dll
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\bin\Debug\NetStatusAPI.pdb
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.csprojResolveAssemblyReference.cache
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.Form1.resources
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.Properties.Resources.resources
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.csproj.GenerateResource.Cache
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.csproj.CoreCompileInputs.cache
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.exe
+C:\Users\peng\source\repos\NetStatusSharp\NetStatusSharp\obj\Debug\NetStatusSharp.pdb
