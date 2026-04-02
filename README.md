@@ -53,8 +53,3 @@ NetStatusSharp\bin\Release\NetStatusSharp.exe
 - 协议
 - TCP 状态
 
-## GitHub Actions
-
-- 推送到 `main` 或提交 Pull Request 时，会自动执行编译检查。
-- 推送形如 `v1.0.0` 的标签时，会自动编译并发布 GitHub Release。
-- Release 附带的 `zip` 文件只包含运行应用所需的核心文件，并在构建产物存在时附带额外运行相关文件。

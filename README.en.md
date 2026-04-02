@@ -43,9 +43,3 @@ After building, start:
 ```text
 NetStatusSharp\bin\Release\NetStatusSharp.exe
 ```
-
-## GitHub Actions
-
-- Pushes to `main` and pull requests trigger an automatic build.
-- Pushing a tag such as `v1.0.0` triggers an automatic GitHub Release build.
-- The release `zip` includes the core runtime files required to launch the app, plus optional runtime files when they exist in the build output.
