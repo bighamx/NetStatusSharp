@@ -1,128 +1,154 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace ProcessViewer
 {
-
-    /// <summary>
-    /// 通过API获取进程图标
-    /// </summary>
-    public class ProcessAPI
+    public static class ProcessAPI
     {
+        private const uint FILE_ATTRIBUTE_NORMAL = 0x80;
+
         [DllImport("Shell32.dll")]
-        private static extern int SHGetFileInfo
-        (
-        string pszPath,
-        uint dwFileAttributes,
-        out SHFILEINFO psfi,
-        uint cbfileInfo,
-        SHGFI uFlags
-        );
+        private static extern IntPtr SHGetFileInfo(
+            string pszPath,
+            uint dwFileAttributes,
+            out SHFILEINFO psfi,
+            uint cbfileInfo,
+            SHGFI uFlags);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool DestroyIcon(IntPtr hIcon);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct SHFILEINFO
         {
-            public SHFILEINFO(bool b)
-            {
-                hIcon = IntPtr.Zero; iIcon = 0; dwAttributes = 0; szDisplayName = ""; szTypeName = "";
-            }
             public IntPtr hIcon;
             public int iIcon;
             public uint dwAttributes;
+
             [MarshalAs(UnmanagedType.LPStr, SizeConst = 260)]
             public string szDisplayName;
+
             [MarshalAs(UnmanagedType.LPStr, SizeConst = 80)]
             public string szTypeName;
-        };
+        }
 
+        [Flags]
         private enum SHGFI
         {
             SmallIcon = 0x00000001,
             LargeIcon = 0x00000000,
             Icon = 0x00000100,
-            DisplayName = 0x00000200,
-            Typename = 0x00000400,
-            SysIconIndex = 0x00004000,
             UseFileAttributes = 0x00000010
         }
-        //获取进程图标
-        private static Dictionary<string, Icon> Cache = new Dictionary<string, Icon>();
+
+        private static readonly object IconCacheLock = new object();
+        private static readonly object ProcessNameCacheLock = new object();
+        private static readonly Dictionary<string, Icon> IconCache = new Dictionary<string, Icon>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<int, string> ProcessNameCache = new Dictionary<int, string>();
+
         public static Icon GetIcon(string strPath, bool bSmall)
         {
-            if (Cache.ContainsKey(strPath))
+            if (string.IsNullOrEmpty(strPath))
             {
-                return Cache[strPath];
+                return null;
             }
+
+            lock (IconCacheLock)
+            {
+                Icon cachedIcon;
+                if (IconCache.TryGetValue(strPath, out cachedIcon))
+                {
+                    return cachedIcon;
+                }
+
+                Icon icon = TryLoadIcon(strPath, bSmall);
+                IconCache[strPath] = icon;
+                return icon;
+            }
+        }
+
+        public static Icon GetIcon(int pid, bool bSmall)
+        {
             try
             {
-                SHFILEINFO info = new SHFILEINFO(true);
-                int cbFileInfo = Marshal.SizeOf(info);
-                SHGFI flags;
-                if (bSmall)
-                    flags = SHGFI.Icon | SHGFI.SmallIcon | SHGFI.UseFileAttributes;
-                else
-                    flags = SHGFI.Icon | SHGFI.LargeIcon | SHGFI.UseFileAttributes;
-
-                SHGetFileInfo(strPath, 256, out info, (uint)cbFileInfo, flags);
-                var ico = Icon.FromHandle(info.hIcon);
-                Cache.Add(strPath, ico);
-                return ico;
+                using (Process process = Process.GetProcessById(pid))
+                {
+                    return GetIcon(process.MainModule.FileName, bSmall);
+                }
             }
             catch (Exception)
             {
-                Cache.Add(strPath, null);
-                return null;
-            }
-
-        }
-
-
-        //获取进程图标
-        //private static Dictionary<int, Icon> Cache2 = new Dictionary<int, Icon>();
-        public static Icon GetIcon(int pid, bool bSmall)
-        {
-
-            try
-            {
-                var p = System.Diagnostics.Process.GetProcessById(pid);
-                var ico = GetIcon(p.MainModule.FileName, bSmall);
-
-                return ico;
-            }
-            catch (Exception ex)
-            {
                 return null;
             }
         }
-
-        //获取进程名称
-        private static Dictionary<int, string> ProcessNameCache = new Dictionary<int, string>();
 
         public static string GetProcessNameByPID(int processID)
         {
-            // 检查缓存中是否已有该进程名称
-            if (ProcessNameCache.ContainsKey(processID))
+            lock (ProcessNameCacheLock)
             {
-                return ProcessNameCache[processID];
+                string cachedName;
+                if (ProcessNameCache.TryGetValue(processID, out cachedName))
+                {
+                    return cachedName;
+                }
             }
 
             try
             {
-                // 获取进程名称并添加到缓存
-                Process p = Process.GetProcessById(processID);
-                string processName = p.ProcessName;
-                ProcessNameCache[processID] = processName;
-                return processName;
+                using (Process process = Process.GetProcessById(processID))
+                {
+                    string processName = process.ProcessName;
+                    lock (ProcessNameCacheLock)
+                    {
+                        ProcessNameCache[processID] = processName;
+                    }
+
+                    return processName;
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // 如果获取失败，缓存 "Unknown" 并返回
-                ProcessNameCache[processID] = "Unknown";
+                lock (ProcessNameCacheLock)
+                {
+                    ProcessNameCache[processID] = "Unknown";
+                }
+
                 return "Unknown";
+            }
+        }
+
+        private static Icon TryLoadIcon(string strPath, bool bSmall)
+        {
+            SHFILEINFO info;
+            SHGFI flags = bSmall
+                ? SHGFI.Icon | SHGFI.SmallIcon | SHGFI.UseFileAttributes
+                : SHGFI.Icon | SHGFI.LargeIcon | SHGFI.UseFileAttributes;
+
+            IntPtr result = SHGetFileInfo(
+                strPath,
+                FILE_ATTRIBUTE_NORMAL,
+                out info,
+                (uint)Marshal.SizeOf(typeof(SHFILEINFO)),
+                flags);
+
+            if (result == IntPtr.Zero || info.hIcon == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            try
+            {
+                using (Icon sourceIcon = Icon.FromHandle(info.hIcon))
+                {
+                    return (Icon)sourceIcon.Clone();
+                }
+            }
+            finally
+            {
+                DestroyIcon(info.hIcon);
             }
         }
     }
