@@ -1,0 +1,10 @@
+# codex: local build artifacts
+.vs/
+**/.vs/
+[Bb]in/
+[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
+node_modules/
+**/node_modules/
+# codex: end local build artifacts
