@@ -58,3 +58,9 @@ NetStatusSharp\bin\Release\NetStatusSharp.exe
 - 仓库已经配置忽略本地 IDE 状态文件和构建产物。
 - 早期提交中曾包含 Visual Studio 缓存和编译输出，当前已按仓库整理规则逐步清理。
 - 本项目依赖 Windows 专用 API，不适用于 macOS 或 Linux。
+
+## GitHub Actions
+
+- 推送到 `main` 或提交 Pull Request 时，会自动执行编译检查。
+- 推送形如 `v1.0.0` 的标签时，会自动编译并发布 GitHub Release。
+- Release 会附带一个自动打包的 `zip` 文件，内容来自 `NetStatusSharp/bin/Release/`。

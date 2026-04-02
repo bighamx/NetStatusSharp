@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore dependencies
+        run: nuget restore NetStatusSharp.sln
+
+      - name: Build solution
+        run: msbuild NetStatusSharp.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+      - name: Package release files
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $staging = Join-Path $env:RUNNER_TEMP "NetStatusSharp-$tag"
+          $asset = Join-Path $env:RUNNER_TEMP "NetStatusSharp-$tag.zip"
+
+          New-Item -ItemType Directory -Force -Path $staging | Out-Null
+          Copy-Item -Path "NetStatusSharp\bin\Release\*" -Destination $staging -Recurse -Force
+
+          if (Test-Path $asset) {
+            Remove-Item -LiteralPath $asset -Force
+          }
+
+          Compress-Archive -Path (Join-Path $staging "*") -DestinationPath $asset
+          "ASSET_PATH=$asset" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET_PATH }}
+          generate_release_notes: true
