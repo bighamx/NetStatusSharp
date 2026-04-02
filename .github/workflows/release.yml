@@ -41,11 +41,26 @@ jobs:
             "NetStatusSharp.exe.manifest",
             "NetStatusAPI.dll"
           )
+          $requiredFiles = @(
+            "NetStatusSharp.exe",
+            "NetStatusSharp.exe.config",
+            "NetStatusAPI.dll"
+          )
 
           New-Item -ItemType Directory -Force -Path $staging | Out-Null
 
+          foreach ($file in $requiredFiles) {
+            $path = Join-Path $releaseDir $file
+            if (-not (Test-Path $path)) {
+              throw "Required release file not found: $path"
+            }
+          }
+
           foreach ($file in $filesToInclude) {
-            Copy-Item -Path (Join-Path $releaseDir $file) -Destination $staging -Force
+            $path = Join-Path $releaseDir $file
+            if (Test-Path $path) {
+              Copy-Item -Path $path -Destination $staging -Force
+            }
           }
 
           if (Test-Path $asset) {
