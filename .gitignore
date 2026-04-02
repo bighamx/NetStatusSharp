@@ -1,10 +1,33 @@
-# codex: local build artifacts
+# Visual Studio and IDE state
 .vs/
 **/.vs/
+.vscode/
+**/.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# Build output
 [Bb]in/
 [Oo]bj/
 **/[Bb]in/
 **/[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.cache
+*.CopyComplete.txt
+
+# Publish and installer output
+app.publish/
+publish/
+*.application
+
+# Local machine files
+db.lock.txt
+Download errors.txt
+
+# Node-based tooling
 node_modules/
 **/node_modules/
-# codex: end local build artifacts
