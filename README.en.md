@@ -21,7 +21,7 @@ It lists active connections, shows the owning process, and provides a lightweigh
 
 ## Technical Details
 
-- Target framework: `.NET Framework 4.0`
+- Target framework: `.NET Framework 4.8`
 - UI: `Windows Forms`
 - Native APIs: `GetExtendedTcpTable` and `GetExtendedUdpTable`
 - Platform: `Windows only`
@@ -43,8 +43,3 @@ After building, start:
 ```text
 NetStatusSharp\bin\Release\NetStatusSharp.exe
 ```
-
-## Notes
-
-- Local IDE state and generated build artifacts are intentionally ignored by the repository.
-- This project depends on Windows-specific APIs and is not expected to run on macOS or Linux.
