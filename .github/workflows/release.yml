@@ -34,9 +34,19 @@ jobs:
           $tag = "${{ github.ref_name }}"
           $staging = Join-Path $env:RUNNER_TEMP "NetStatusSharp-$tag"
           $asset = Join-Path $env:RUNNER_TEMP "NetStatusSharp-$tag.zip"
+          $releaseDir = "NetStatusSharp\bin\Release"
+          $filesToInclude = @(
+            "NetStatusSharp.exe",
+            "NetStatusSharp.exe.config",
+            "NetStatusSharp.exe.manifest",
+            "NetStatusAPI.dll"
+          )
 
           New-Item -ItemType Directory -Force -Path $staging | Out-Null
-          Copy-Item -Path "NetStatusSharp\bin\Release\*" -Destination $staging -Recurse -Force
+
+          foreach ($file in $filesToInclude) {
+            Copy-Item -Path (Join-Path $releaseDir $file) -Destination $staging -Force
+          }
 
           if (Test-Path $asset) {
             Remove-Item -LiteralPath $asset -Force
