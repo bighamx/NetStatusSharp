@@ -1,58 +1,60 @@
 # NetStatusSharp
 
-NetStatusSharp is a Windows Forms desktop tool for viewing the network connections opened by local processes.
+[English README](README.en.md)
 
-It can enumerate TCP and UDP connections, show the owning process, and filter the results from a lightweight desktop UI.
+NetStatusSharp 是一个基于 Windows Forms 的网络连接查看工具，用于分析当前机器上各个进程占用的 TCP / UDP 连接情况。
 
-## Features
+它可以列出本机连接、显示连接所属进程，并通过桌面界面快速进行筛选和刷新。
 
-- View current TCP and UDP connections on Windows
-- Filter by process name, PID, local port, remote port, protocol, and TCP state
-- Show process name together with the executable icon
-- Refresh the connection list on demand from the desktop UI
+## 功能特性
 
-## Solution Layout
+- 查看当前 Windows 系统中的 TCP 和 UDP 连接
+- 按进程名、PID、本地端口、远程端口、协议、TCP 状态进行筛选
+- 显示进程名称和对应图标
+- 在桌面界面中一键刷新连接列表
 
-- `NetStatusSharp/`: Windows Forms application and filtering UI
-- `NetStatusAPI/`: low-level API wrapper for enumerating connections and resolving process metadata
-- `NetStatusSharp.sln`: Visual Studio solution file
+## 项目结构
 
-## Technical Details
+- `NetStatusSharp/`：WinForms 主程序与筛选界面
+- `NetStatusAPI/`：底层网络连接枚举与进程信息读取封装
+- `NetStatusSharp.sln`：Visual Studio 解决方案文件
 
-- Target framework: `.NET Framework 4.0`
-- UI: `Windows Forms`
-- Native APIs: `GetExtendedTcpTable`, `GetExtendedUdpTable`, and related Windows process metadata lookups
-- Platform: `Windows only`
+## 技术说明
 
-## Build
+- 目标框架：`.NET Framework 4.0`
+- UI：`Windows Forms`
+- 底层能力：调用 Windows 原生 API `GetExtendedTcpTable`、`GetExtendedUdpTable`
+- 运行平台：`仅支持 Windows`
 
-Open `NetStatusSharp.sln` in Visual Studio and build the solution.
+## 构建方式
 
-Or build from the command line:
+使用 Visual Studio 打开 `NetStatusSharp.sln` 后直接编译即可。
+
+命令行示例：
 
 ```powershell
 msbuild .\NetStatusSharp.sln /p:Configuration=Release
 ```
 
-## Run
+## 运行方式
 
-After building, start:
+编译完成后，可运行：
 
 ```text
 NetStatusSharp\bin\Release\NetStatusSharp.exe
 ```
 
-The main window lets you filter by:
+主界面支持以下筛选项：
 
-- Process name
+- 进程名
 - PID
-- Local port
-- Remote TCP port
-- Protocol
-- TCP state
+- 本地端口
+- 远程 TCP 端口
+- 协议
+- TCP 状态
 
-## Development Notes
+## 开发说明
 
-- This repository intentionally ignores local IDE state and generated build output.
-- Older commits previously included Visual Studio cache files and compiled artifacts; those are being cleaned out going forward.
-- The app relies on Windows-specific APIs and is not expected to build or run on macOS or Linux.
+- 仓库已经配置忽略本地 IDE 状态文件和构建产物。
+- 早期提交中曾包含 Visual Studio 缓存和编译输出，当前已按仓库整理规则逐步清理。
+- 本项目依赖 Windows 专用 API，不适用于 macOS 或 Linux。
