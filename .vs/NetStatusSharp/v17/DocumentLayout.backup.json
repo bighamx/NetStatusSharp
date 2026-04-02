@@ -1,0 +1,57 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\GIT\\chuckie\\NetStatusSharp2\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6C819D78-403A-4A11-84C3-BB6D20509BE3}|NetStatusSharp\\NetStatusSharp.csproj|e:\\git\\chuckie\\netstatussharp2\\netstatussharp\\netstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6C819D78-403A-4A11-84C3-BB6D20509BE3}|NetStatusSharp\\NetStatusSharp.csproj|solutionrelative:netstatussharp\\netstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6C819D78-403A-4A11-84C3-BB6D20509BE3}|NetStatusSharp\\NetStatusSharp.csproj|E:\\GIT\\chuckie\\NetStatusSharp2\\netstatussharp\\netstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6C819D78-403A-4A11-84C3-BB6D20509BE3}|NetStatusSharp\\NetStatusSharp.csproj|solutionrelative:netstatussharp\\netstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NetStatus.cs",
+              "DocumentMoniker": "E:\\GIT\\chuckie\\NetStatusSharp2\\NetStatusSharp\\NetStatus.cs",
+              "RelativeDocumentMoniker": "NetStatusSharp\\NetStatus.cs",
+              "ToolTip": "E:\\GIT\\chuckie\\NetStatusSharp2\\NetStatusSharp\\NetStatus.cs",
+              "RelativeToolTip": "NetStatusSharp\\NetStatus.cs",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAowHkAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2022-06-21T08:05:40.093Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "NetStatus.cs [\u8BBE\u8BA1]",
+              "DocumentMoniker": "E:\\GIT\\chuckie\\NetStatusSharp2\\NetStatusSharp\\NetStatus.cs",
+              "RelativeDocumentMoniker": "NetStatusSharp\\NetStatus.cs",
+              "ToolTip": "E:\\GIT\\chuckie\\NetStatusSharp2\\NetStatusSharp\\NetStatus.cs [\u8BBE\u8BA1]",
+              "RelativeToolTip": "NetStatusSharp\\NetStatus.cs [\u8BBE\u8BA1]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2022-06-21T08:05:37.276Z",
+              "EditorCaption": " [\u8BBE\u8BA1]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

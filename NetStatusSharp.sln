@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStatusSharp", "NetStatusSharp\NetStatusSharp.csproj", "{6C819D78-403A-4A11-84C3-BB6D20509BE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStatusAPI", "NetStatusAPI\NetStatusAPI.csproj", "{DD018A23-E534-49F9-AA7F-DDB6D8232B68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C819D78-403A-4A11-84C3-BB6D20509BE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C819D78-403A-4A11-84C3-BB6D20509BE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C819D78-403A-4A11-84C3-BB6D20509BE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C819D78-403A-4A11-84C3-BB6D20509BE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD018A23-E534-49F9-AA7F-DDB6D8232B68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD018A23-E534-49F9-AA7F-DDB6D8232B68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD018A23-E534-49F9-AA7F-DDB6D8232B68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD018A23-E534-49F9-AA7F-DDB6D8232B68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1373AA60-41D2-492F-B275-9328AC9A4DA7}
+	EndGlobalSection
+EndGlobal

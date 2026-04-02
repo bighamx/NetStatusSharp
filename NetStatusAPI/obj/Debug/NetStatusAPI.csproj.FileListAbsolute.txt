@@ -1,0 +1,8 @@
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\bin\Debug\NetStatusAPI.dll
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\bin\Debug\NetStatusAPI.pdb
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\bin\Debug\System.Net.Http.dll
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\obj\Debug\NetStatusAPI.csproj.CoreCompileInputs.cache
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\obj\Debug\NetStatusAPI.dll
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\obj\Debug\NetStatusAPI.pdb
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\obj\Debug\NetStatusAPI.csproj.AssemblyReference.cache
+E:\GIT\chuckie\NetStatusSharp2\NetStatusAPI\obj\Debug\NetStatu.59EE88B0.Up2Date

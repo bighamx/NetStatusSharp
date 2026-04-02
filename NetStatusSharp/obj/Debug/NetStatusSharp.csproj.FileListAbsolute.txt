@@ -1,0 +1,17 @@
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusSharp.exe.config
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusSharp.exe
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusSharp.pdb
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusAPI.dll
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusAPI.pdb
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.csproj.AssemblyReference.cache
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.NetStatus.resources
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.Properties.Resources.resources
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.csproj.GenerateResource.cache
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.csproj.CoreCompileInputs.cache
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.exe
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.pdb
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusSharp.exe.manifest
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\bin\Debug\NetStatusSharp.application
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.exe.manifest
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatusSharp.application
+E:\GIT\chuckie\NetStatusSharp2\NetStatusSharp\obj\Debug\NetStatu.0D197D9F.Up2Date
