@@ -1,7 +1,6 @@
 using ProcessViewer;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,8 +23,7 @@ namespace NetStatusSharp
                 return;
             }
 
-            FilterCriteria criteria;
-            if (!TryBuildCriteria(out criteria))
+            if (!TryBuildCriteria(out var criteria))
             {
                 return;
             }
@@ -174,13 +172,10 @@ namespace NetStatusSharp
         private bool TryBuildCriteria(out FilterCriteria criteria)
         {
             List<string> processNames = SplitAndTrim(textBox1.Text);
-            List<int> pids;
-            List<ushort> localPorts;
-            List<ushort> remotePorts;
 
-            if (!TryParseIntList(textBox4.Text, "PID", out pids) ||
-                !TryParsePortList(textBox2.Text, "本地端口", out localPorts) ||
-                !TryParsePortList(textBox3.Text, "远程端口", out remotePorts))
+            if (!TryParseIntList(textBox4.Text, "PID", out var pids) ||
+                !TryParsePortList(textBox2.Text, "本地端口", out var localPorts) ||
+                !TryParsePortList(textBox3.Text, "远程端口", out var remotePorts))
             {
                 criteria = null;
                 return false;
@@ -207,8 +202,7 @@ namespace NetStatusSharp
             values = new List<int>();
             foreach (string item in SplitAndTrim(input))
             {
-                int value;
-                if (!int.TryParse(item, out value) || value < 0)
+                if (!int.TryParse(item, out var value) || value < 0)
                 {
                     ShowValidationError(fieldName, item);
                     return false;
@@ -225,8 +219,7 @@ namespace NetStatusSharp
             values = new List<ushort>();
             foreach (string item in SplitAndTrim(input))
             {
-                ushort value;
-                if (!ushort.TryParse(item, out value))
+                if (!ushort.TryParse(item, out var value))
                 {
                     ShowValidationError(fieldName, item);
                     return false;
