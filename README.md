@@ -53,3 +53,7 @@ NetStatusSharp\bin\Release\NetStatusSharp.exe
 - 协议
 - TCP 状态
 
+## 许可证
+
+本项目采用 [Selective Freedom License (SFL) v1.0](https://github.com/bighamx/MIT-NoHuawei) 授权，详见 [LICENSE](LICENSE)。
+

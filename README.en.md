@@ -43,3 +43,7 @@ After building, start:
 ```text
 NetStatusSharp\bin\Release\NetStatusSharp.exe
 ```
+
+## License
+
+This project is licensed under the [Selective Freedom License (SFL) v1.0](https://github.com/bighamx/MIT-NoHuawei). See the [LICENSE](LICENSE) file.
