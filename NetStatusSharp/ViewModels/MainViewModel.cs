@@ -21,6 +21,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     private string localPortFilter = string.Empty;
     private string remotePortFilter = string.Empty;
     private string selectedProtocol = "TCP";
+    private string selectedIpVersion = "全部";
     private string selectedState = "全部状态";
     private string statusText = "准备就绪";
     private bool isBusy;
@@ -33,6 +34,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     public MainViewModel()
     {
         ProtocolOptions = ["全部", "TCP", "UDP"];
+        IpVersionOptions = ["全部", "IPv4", "IPv6"];
         StateOptions =
         [
             "全部状态", "已关闭", "监听", "SYN 已发送", "SYN 已接收", "已建立",
@@ -41,6 +43,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync, () => !IsBusy);
         CancelCommand = new RelayCommand(Cancel, () => IsBusy);
+        RefreshOrCancelCommand = new RelayCommand(RefreshOrCancel);
         ClearCommand = new AsyncRelayCommand(ClearAndRefreshAsync, () => !IsBusy);
 
         autoRefreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
@@ -63,10 +66,14 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     }
 
     public IReadOnlyList<string> ProtocolOptions { get; }
+    public IReadOnlyList<string> IpVersionOptions { get; }
     public IReadOnlyList<string> StateOptions { get; }
     public AsyncRelayCommand RefreshCommand { get; }
     public RelayCommand CancelCommand { get; }
+    public RelayCommand RefreshOrCancelCommand { get; }
     public AsyncRelayCommand ClearCommand { get; }
+
+    public string RefreshButtonText => IsBusy ? "停止" : "刷新";
 
     public string ProcessNameFilter
     {
@@ -110,6 +117,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         set => SetField(ref selectedState, value);
     }
 
+    public string SelectedIpVersion
+    {
+        get => selectedIpVersion;
+        set => SetField(ref selectedIpVersion, value);
+    }
+
     public bool RemoteFiltersEnabled => SelectedProtocol != "UDP";
 
     public bool AutoRefresh
@@ -143,6 +156,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 RefreshCommand.RaiseCanExecuteChanged();
                 CancelCommand.RaiseCanExecuteChanged();
                 ClearCommand.RaiseCanExecuteChanged();
+                OnPropertyChanged(nameof(RefreshButtonText));
             }
         }
     }
@@ -231,6 +245,17 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         StatusText = "正在取消刷新…";
     }
 
+    private async void RefreshOrCancel()
+    {
+        if (IsBusy)
+        {
+            Cancel();
+            return;
+        }
+
+        await RefreshAsync();
+    }
+
     public void Dispose()
     {
         autoRefreshTimer.Stop();
@@ -245,6 +270,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         LocalPortFilter = string.Empty;
         RemotePortFilter = string.Empty;
         SelectedProtocol = "TCP";
+        SelectedIpVersion = "全部";
         SelectedState = "全部状态";
         await RefreshAsync();
     }
@@ -269,8 +295,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         ConnectionState? state = SelectedState == "全部状态"
             ? null
             : (ConnectionState?)StateOptions.IndexOf(SelectedState);
+        string? ipVersion = SelectedIpVersion == "全部" ? null : SelectedIpVersion;
 
-        filter = new ConnectionFilter(processNames, processIds, localPorts, remotePorts, isTcp, state);
+        filter = new ConnectionFilter(processNames, processIds, localPorts, remotePorts, isTcp, ipVersion, state);
         return true;
     }
 

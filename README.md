@@ -2,16 +2,20 @@
 
 [English README](README.en.md)
 
-NetStatusSharp 是一个面向 Windows 的轻量网络连接监视器，用于按进程查看和筛选本机 IPv4 TCP / UDP 连接。
+NetStatusSharp 是一个面向 Windows 的轻量网络连接监视器，用于按进程查看和筛选本机 IPv4 / IPv6 TCP / UDP 连接。
 
 ![NetStatusSharp 浅色界面](docs/screenshot.png)
 
 ## 功能特性
 
-- 查看连接所属进程、PID、本地端点、远程端点和 TCP 状态
-- 按进程名、PID、本地端口、远程端口、协议及 TCP 状态筛选
+- 查看连接所属进程、PID、协议族、本地端点、远程端点和 TCP 状态
+- 按进程名、PID、本地端口、远程端口、协议、IP 版本及 TCP 状态筛选
+- IPv6 端点以 `[地址]:端口` 形式显示，表格中的 IP 列区分 IPv4 / IPv6
 - 浅色高 DPI WPF 界面，支持表格虚拟化、列排序和多行复制
+- 表头显示升序 / 降序排序指示，并支持拖动调整列宽
+- 自动记住调整后的列宽，下次启动时恢复（`%APPDATA%\NetStatusSharp\layout.json`）
 - 异步采集连接，刷新期间界面保持响应并可随时取消
+- 刷新按钮在采集期间原位变为“停止”，标题区域不会闪烁跳动
 - 同一 PID 每轮只解析一次进程信息，先过滤连接再读取进程与图标
 - 可选每 5 秒自动刷新，底部显示连接数量、耗时和更新时间
 
@@ -33,8 +37,8 @@ NetStatusSharp 是一个面向 Windows 的轻量网络连接监视器，用于�
 
 - 目标框架：`.NET 8 (net8.0-windows)`
 - UI：`WPF`
-- 原生 API：`GetExtendedTcpTable`、`GetExtendedUdpTable`
-- 当前连接范围：IPv4
+- 原生 API：`GetExtendedTcpTable`、`GetExtendedUdpTable`（含 `AF_INET6`）
+- 当前连接范围：IPv4 与 IPv6
 - 运行平台：Windows 10 或更高版本
 
 ## 构建和运行

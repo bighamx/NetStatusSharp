@@ -67,7 +67,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource Border}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Height" Value="46" />
-        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Padding" Value="7,7" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
@@ -94,7 +94,7 @@
     <Style x:Key="ComboItem" TargetType="ComboBoxItem">
         <Setter Property="Background" Value="{StaticResource Bg2}" />
         <Setter Property="Foreground" Value="{StaticResource Fg}" />
-        <Setter Property="Padding" Value="9,6" />
+        <Setter Property="Padding" Value="7,6" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Style.Triggers>
             <Trigger Property="IsHighlighted" Value="True">
@@ -179,6 +179,7 @@
         <Setter Property="Foreground" Value="{StaticResource Fg}" />
         <Setter Property="BorderBrush" Value="{StaticResource Border}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="46" />
         <Setter Property="Padding" Value="14,7" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Cursor" Value="Hand" />
@@ -207,17 +208,72 @@
         </Setter>
     </Style>
 
-    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource FlatButton}">
+    <Style x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="Background" Value="#347FC9" />
         <Setter Property="BorderBrush" Value="{StaticResource Accent}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="46" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="14,7" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="PrimaryButtonBorder" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PrimaryButtonBorder" Property="Background" Value="#236FB7" />
+                            <Setter TargetName="PrimaryButtonBorder" Property="BorderBrush" Value="#1A5F9D" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="PrimaryButtonBorder" Property="Background" Value="#19588F" />
+                            <Setter TargetName="PrimaryButtonBorder" Property="BorderBrush" Value="#154A78" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="PrimaryButtonBorder" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource FgMuted}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FontSize" Value="11" />
+    </Style>
+
+    <!-- 列宽拖拽手柄：宽度即热区，透明背景保持外观不变 -->
+    <Style x:Key="ColumnHeaderGripper" TargetType="Thumb">
+        <Setter Property="Width" Value="7" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="SizeWE" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Rectangle x:Name="GripLine" Width="1" HorizontalAlignment="Center"
+                                   Fill="{StaticResource Accent}" Opacity="0" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="GripLine" Property="Opacity" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="GripLine" Property="Opacity" Value="1" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="GridHeader" TargetType="DataGridColumnHeader">
@@ -230,15 +286,78 @@
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridColumnHeader">
+                    <Grid>
+                        <Border x:Name="HeaderBorder" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <!-- 右侧留白 = 排序箭头 8px + 拖拽热区 7px + 间距，避免两者重叠 -->
+                                <ContentPresenter Margin="0,0,22,0" VerticalAlignment="Center"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                  RecognizesAccessKey="True" />
+                                <Path x:Name="SortArrow" Width="8" Height="6" HorizontalAlignment="Right"
+                                      Margin="0,0,9,0"
+                                      VerticalAlignment="Center" Fill="{StaticResource Accent}"
+                                      Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+
+                        <!-- 列宽拖拽手柄：必须由模板提供，否则 DataGrid 无法调整列宽 -->
+                        <Thumb x:Name="PART_RightHeaderGripper" Style="{StaticResource ColumnHeaderGripper}"
+                               HorizontalAlignment="Right" />
+                        <Thumb x:Name="PART_LeftHeaderGripper" Style="{StaticResource ColumnHeaderGripper}"
+                               HorizontalAlignment="Left" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource Bg3}" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Ascending">
+                            <Setter TargetName="SortArrow" Property="Data" Value="M 0 6 L 4 0 L 8 6 Z" />
+                            <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Descending">
+                            <Setter TargetName="SortArrow" Property="Data" Value="M 0 0 L 4 6 L 8 0 Z" />
+                            <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="GridCell" TargetType="DataGridCell">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="11,0" />
+        <!-- 必须 Stretch，否则 TextBlock 会按内容宽度撑开，省略号截断失效 -->
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource Fg}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
+
+    <Style x:Key="GridText" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <Style x:Key="GridNumber" TargetType="TextBlock" BasedOn="{StaticResource GridText}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+
+    <!-- 端点列：等宽字体 + 溢出省略号，完整值通过悬停提示查看（IPv6 地址较长） -->
+    <Style x:Key="GridEndpoint" TargetType="TextBlock" BasedOn="{StaticResource GridText}">
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas" />
+        <Setter Property="Foreground" Value="#526275" />
+        <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
     </Style>
 
     <Style x:Key="GridRow" TargetType="DataGridRow">

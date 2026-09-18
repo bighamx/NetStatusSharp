@@ -48,18 +48,13 @@
                                    Foreground="{StaticResource FgMuted}" FontSize="10.5" Margin="0,2,0,0" />
                     </StackPanel>
                     <Border Style="{StaticResource Pill}" Background="{StaticResource Bg3}" Margin="12,0,0,0">
-                        <TextBlock Text="IPv4" FontSize="10" Foreground="{StaticResource FgMuted}" />
+                        <TextBlock Text="IPv4 / IPv6" FontSize="10" Foreground="{StaticResource FgMuted}" />
                     </Border>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <CheckBox Content="自动刷新 5 秒" IsChecked="{Binding AutoRefresh}"
-                              Margin="0,0,16,0" ToolTip="每 5 秒按当前条件重新读取连接" />
-                    <Button Content="停止" Style="{StaticResource FlatButton}" Command="{Binding CancelCommand}"
-                            MinWidth="72" Margin="0,0,8,0"
-                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
-                    <Button Content="刷新" Style="{StaticResource PrimaryButton}" Command="{Binding RefreshCommand}"
-                            MinWidth="88" ToolTip="重新读取系统连接（F5）" />
+                              ToolTip="每 5 秒按当前条件重新读取连接" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -68,13 +63,15 @@
         <Border Grid.Row="1" Style="{StaticResource Card}" Margin="16,14,16,0" Padding="14,12">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2.15*" />
-                    <ColumnDefinition Width="1.05*" />
-                    <ColumnDefinition Width="1.15*" />
-                    <ColumnDefinition Width="1.25*" />
-                    <ColumnDefinition Width="0.9*" />
-                    <ColumnDefinition Width="1.35*" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="0.75*" />
+                    <ColumnDefinition Width="0.75*" />
+                    <ColumnDefinition Width="0.75*" />
+                    <ColumnDefinition Width="0.85*" />
+                    <ColumnDefinition Width="0.85*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="0.6*" />
+                    <ColumnDefinition Width="0.55*" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
@@ -83,7 +80,7 @@
                         <TextBox x:Name="ProcessNameBox" Style="{StaticResource TextInput}"
                                  Text="{Binding ProcessNameFilter, UpdateSourceTrigger=PropertyChanged}"
                                  KeyDown="FilterBox_KeyDown" ToolTip="名称包含匹配，不区分大小写" />
-                        <TextBlock Text="名称包含…" Foreground="{StaticResource FgDim}" Margin="11,0"
+                        <TextBlock Text="名称包含…" Foreground="{StaticResource FgDim}" Margin="8,0"
                                    VerticalAlignment="Center" IsHitTestVisible="False">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -123,13 +120,23 @@
                               SelectedItem="{Binding SelectedProtocol}" />
                 </StackPanel>
 
-                <StackPanel Grid.Column="5" Margin="0,0,10,0" IsEnabled="{Binding RemoteFiltersEnabled}">
+                <StackPanel Grid.Column="5" Margin="0,0,10,0">
+                    <TextBlock Text="IP 版本" Style="{StaticResource LabelText}" />
+                    <ComboBox Style="{StaticResource FlatCombo}" ItemsSource="{Binding IpVersionOptions}"
+                              SelectedItem="{Binding SelectedIpVersion}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="6" Margin="0,0,10,0" IsEnabled="{Binding RemoteFiltersEnabled}">
                     <TextBlock Text="TCP 状态" Style="{StaticResource LabelText}" />
                     <ComboBox Style="{StaticResource FlatCombo}" ItemsSource="{Binding StateOptions}"
                               SelectedItem="{Binding SelectedState}" />
                 </StackPanel>
 
-                <Button Grid.Column="6" Content="清空" Style="{StaticResource FlatButton}"
+                <Button Grid.Column="7" Content="{Binding RefreshButtonText}" Style="{StaticResource PrimaryButton}"
+                        Command="{Binding RefreshOrCancelCommand}" VerticalAlignment="Bottom" Margin="0,0,8,0"
+                        ToolTip="刷新连接；刷新期间可点击停止" />
+
+                <Button Grid.Column="8" Content="清空" Style="{StaticResource FlatButton}"
                         Command="{Binding ClearCommand}" VerticalAlignment="Bottom" MinWidth="74"
                         ToolTip="清空筛选并刷新（Ctrl+L）" />
             </Grid>
@@ -178,7 +185,8 @@
                           ItemsSource="{Binding Rows}" FrozenColumnCount="3"
                           CopyingRowClipboardContent="ConnectionGrid_CopyingRowClipboardContent">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="52" />
+                        <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="52"
+                                           ElementStyle="{StaticResource GridNumber}" />
                         <DataGridTemplateColumn Header="" Width="42" CanUserSort="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -186,7 +194,8 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="进程" Binding="{Binding ProcessName}" Width="*" MinWidth="160" />
+                        <DataGridTextColumn Header="进程" Binding="{Binding ProcessName}" Width="*" MinWidth="160"
+                                           ElementStyle="{StaticResource GridText}" />
                         <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="82">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
@@ -206,24 +215,20 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="本地端点" Binding="{Binding LocalEndpoint}" Width="190">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontFamily" Value="Cascadia Mono, Consolas" />
-                                    <Setter Property="Foreground" Value="#526275" />
-                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Header="远程端点" Binding="{Binding RemoteEndpoint}" Width="190">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontFamily" Value="Cascadia Mono, Consolas" />
-                                    <Setter Property="Foreground" Value="#526275" />
-                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                        <DataGridTemplateColumn Header="IP" SortMemberPath="IpVersion" Width="72">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource Pill}" Background="{StaticResource Bg3}">
+                                        <TextBlock Text="{Binding IpVersion}" Foreground="{Binding IpVersionBrush}"
+                                                   FontSize="10.5" FontWeight="SemiBold" />
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="本地端点" Binding="{Binding LocalEndpoint}" Width="1.45*"
+                                           MinWidth="190" ElementStyle="{StaticResource GridEndpoint}" />
+                        <DataGridTextColumn Header="远程端点" Binding="{Binding RemoteEndpoint}" Width="1.45*"
+                                           MinWidth="190" ElementStyle="{StaticResource GridEndpoint}" />
                         <DataGridTemplateColumn Header="状态" SortMemberPath="State" Width="126">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>

@@ -16,40 +16,90 @@ public sealed class ConnectionProvider
 
         if (filter.IsTcp is null or true)
         {
-            foreach (TcpRow row in NetProcessAPI.GetAllTcpConnections())
+            if (filter.IpVersion is null or "IPv4")
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (!MatchesCommon(filter, row.owningPid, row.LocalPort) ||
-                    (filter.RemotePorts.Count > 0 && !filter.RemotePorts.Contains(row.RemotePort)) ||
-                    (filter.State.HasValue && row.state != filter.State.Value))
+                foreach (TcpRow row in NetProcessAPI.GetAllTcpConnections())
                 {
-                    continue;
-                }
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!MatchesCommon(filter, row.owningPid, row.LocalPort) ||
+                        (filter.RemotePorts.Count > 0 && !filter.RemotePorts.Contains(row.RemotePort)) ||
+                        (filter.State.HasValue && row.state != filter.State.Value))
+                    {
+                        continue;
+                    }
 
-                candidates.Add(new Candidate(
-                    row.owningPid,
-                    "TCP",
-                    FormatEndpoint(row.LocalAddress, row.LocalPort),
-                    FormatEndpoint(row.RemoteAddress, row.RemotePort),
-                    GetStateText(row.state),
-                    row.LocalPort));
+                    candidates.Add(new Candidate(
+                        row.owningPid,
+                        "TCP",
+                        "IPv4",
+                        FormatEndpoint(row.LocalAddress, row.LocalPort),
+                        FormatEndpoint(row.RemoteAddress, row.RemotePort),
+                        GetStateText(row.state),
+                        row.LocalPort));
+                }
+            }
+
+            if (filter.IpVersion is null or "IPv6")
+            {
+                foreach (Tcp6Row row in NetProcessAPI.GetAllTcp6Connections())
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!MatchesCommon(filter, row.owningPid, row.LocalPort) ||
+                        (filter.RemotePorts.Count > 0 && !filter.RemotePorts.Contains(row.RemotePort)) ||
+                        (filter.State.HasValue && row.state != filter.State.Value))
+                    {
+                        continue;
+                    }
+
+                    candidates.Add(new Candidate(
+                        row.owningPid,
+                        "TCP",
+                        "IPv6",
+                        FormatEndpoint(row.LocalAddress, row.LocalPort),
+                        FormatEndpoint(row.RemoteAddress, row.RemotePort),
+                        GetStateText(row.state),
+                        row.LocalPort));
+                }
             }
         }
 
         if (filter.IsTcp is null or false)
         {
-            foreach (UdpRow row in NetProcessAPI.GetAllUdpConnections())
+            if (filter.IpVersion is null or "IPv4")
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (MatchesCommon(filter, row.owningPid, row.LocalPort))
+                foreach (UdpRow row in NetProcessAPI.GetAllUdpConnections())
                 {
-                    candidates.Add(new Candidate(
-                        row.owningPid,
-                        "UDP",
-                        FormatEndpoint(row.LocalAddress, row.LocalPort),
-                        "-",
-                        "-",
-                        row.LocalPort));
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (MatchesCommon(filter, row.owningPid, row.LocalPort))
+                    {
+                        candidates.Add(new Candidate(
+                            row.owningPid,
+                            "UDP",
+                            "IPv4",
+                            FormatEndpoint(row.LocalAddress, row.LocalPort),
+                            "-",
+                            "-",
+                            row.LocalPort));
+                    }
+                }
+            }
+
+            if (filter.IpVersion is null or "IPv6")
+            {
+                foreach (Udp6Row row in NetProcessAPI.GetAllUdp6Connections())
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (MatchesCommon(filter, row.owningPid, row.LocalPort))
+                    {
+                        candidates.Add(new Candidate(
+                            row.owningPid,
+                            "UDP",
+                            "IPv6",
+                            FormatEndpoint(row.LocalAddress, row.LocalPort),
+                            "-",
+                            "-",
+                            row.LocalPort));
+                    }
                 }
             }
         }
@@ -93,6 +143,7 @@ public sealed class ConnectionProvider
                 ProcessName = process.Name,
                 ProcessId = candidate.ProcessId,
                 Protocol = candidate.Protocol,
+                IpVersion = candidate.IpVersion,
                 LocalEndpoint = candidate.LocalEndpoint,
                 RemoteEndpoint = candidate.RemoteEndpoint,
                 State = candidate.State
@@ -135,7 +186,10 @@ public sealed class ConnectionProvider
         }
     }
 
-    private static string FormatEndpoint(IPAddress address, ushort port) => $"{address}:{port}";
+    private static string FormatEndpoint(IPAddress address, ushort port) =>
+        address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6
+            ? $"[{address}]:{port}"
+            : $"{address}:{port}";
 
     private static string GetStateText(ConnectionState state) => state switch
     {
@@ -157,6 +211,7 @@ public sealed class ConnectionProvider
     private sealed record Candidate(
         int ProcessId,
         string Protocol,
+        string IpVersion,
         string LocalEndpoint,
         string RemoteEndpoint,
         string State,

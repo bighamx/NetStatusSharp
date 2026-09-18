@@ -2,16 +2,20 @@
 
 [中文说明](README.md)
 
-NetStatusSharp is a lightweight Windows network connection monitor for inspecting and filtering local IPv4 TCP and UDP connections by process.
+NetStatusSharp is a lightweight Windows network connection monitor for inspecting and filtering local IPv4 and IPv6 TCP and UDP connections by process.
 
 ![NetStatusSharp light interface](docs/screenshot.png)
 
 ## Features
 
-- View process name, PID, local endpoint, remote endpoint, and TCP state
-- Filter by process name, PID, local port, remote port, protocol, and TCP state
+- View process name, PID, address family, local endpoint, remote endpoint, and TCP state
+- Filter by process name, PID, local port, remote port, protocol, IP version, and TCP state
+- IPv6 endpoints are shown as `[address]:port`, and the IP column distinguishes IPv4 from IPv6
 - Light, high-DPI WPF interface with row virtualization, column sorting, and multi-row copy
+- Column headers show ascending and descending sort indicators, and columns can be resized by dragging
+- Column widths are remembered and restored on the next launch (`%APPDATA%\NetStatusSharp\layout.json`)
 - Asynchronous, cancellable refreshes that keep the interface responsive
+- The refresh button turns into "stop" in place while a scan runs, so the header area never flickers
 - Resolve each PID only once per refresh and filter connections before loading process metadata
 - Optional five-second automatic refresh with result count, duration, and update time
 
@@ -33,8 +37,8 @@ NetStatusSharp is a lightweight Windows network connection monitor for inspectin
 
 - Target framework: `.NET 8 (net8.0-windows)`
 - UI: `WPF`
-- Native APIs: `GetExtendedTcpTable` and `GetExtendedUdpTable`
-- Current connection scope: IPv4
+- Native APIs: `GetExtendedTcpTable` and `GetExtendedUdpTable`, including `AF_INET6`
+- Current connection scope: IPv4 and IPv6
 - Platform: Windows 10 or later
 
 ## Build and run

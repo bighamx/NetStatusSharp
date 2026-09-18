@@ -8,6 +8,7 @@ namespace ProcessViewer
     public static class NetProcessAPI
     {
         private const int AF_INET = 2;
+        private const int AF_INET6 = 23;
         private const uint ERROR_INSUFFICIENT_BUFFER = 122;
 
         [DllImport("iphlpapi.dll", SetLastError = true)]
@@ -74,6 +75,72 @@ namespace ProcessViewer
                 {
                     table[i] = Marshal.PtrToStructure<UdpRow>(rowPtr);
                     rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf<UdpRow>());
+                }
+
+                return table;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffTable);
+            }
+        }
+
+        public static Tcp6Row[] GetAllTcp6Connections()
+        {
+            int buffSize = 0;
+            uint firstResult = GetExtendedTcpTable(IntPtr.Zero, ref buffSize, true, AF_INET6, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+            EnsureBufferResult(firstResult, buffSize, nameof(GetExtendedTcpTable));
+
+            IntPtr buffTable = Marshal.AllocHGlobal(buffSize);
+            try
+            {
+                uint ret = GetExtendedTcpTable(buffTable, ref buffSize, true, AF_INET6, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+                if (ret != 0)
+                {
+                    throw new Win32Exception((int)ret, "读取 IPv6 TCP 连接表失败。");
+                }
+
+                TcpTable tab = Marshal.PtrToStructure<TcpTable>(buffTable);
+                IntPtr rowPtr = IntPtr.Add(buffTable, sizeof(uint));
+                Tcp6Row[] table = new Tcp6Row[tab.dwNumEntries];
+
+                for (int i = 0; i < tab.dwNumEntries; i++)
+                {
+                    table[i] = Marshal.PtrToStructure<Tcp6Row>(rowPtr);
+                    rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf<Tcp6Row>());
+                }
+
+                return table;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffTable);
+            }
+        }
+
+        public static Udp6Row[] GetAllUdp6Connections()
+        {
+            int buffSize = 0;
+            uint firstResult = GetExtendedUdpTable(IntPtr.Zero, ref buffSize, true, AF_INET6, UDP_TABLE_CLASS.UDP_TABLE_OWNER_PID);
+            EnsureBufferResult(firstResult, buffSize, nameof(GetExtendedUdpTable));
+
+            IntPtr buffTable = Marshal.AllocHGlobal(buffSize);
+            try
+            {
+                uint ret = GetExtendedUdpTable(buffTable, ref buffSize, true, AF_INET6, UDP_TABLE_CLASS.UDP_TABLE_OWNER_PID);
+                if (ret != 0)
+                {
+                    throw new Win32Exception((int)ret, "读取 IPv6 UDP 连接表失败。");
+                }
+
+                UdpTable tab = Marshal.PtrToStructure<UdpTable>(buffTable);
+                IntPtr rowPtr = IntPtr.Add(buffTable, sizeof(uint));
+                Udp6Row[] table = new Udp6Row[tab.dwNumEntries];
+
+                for (int i = 0; i < tab.dwNumEntries; i++)
+                {
+                    table[i] = Marshal.PtrToStructure<Udp6Row>(rowPtr);
+                    rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf<Udp6Row>());
                 }
 
                 return table;
@@ -178,6 +245,49 @@ namespace ProcessViewer
         public uint dwNumEntries;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Tcp6Row
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public byte[] localAddr;
+
+        public uint localScopeId;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public byte[] localPort;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public byte[] remoteAddr;
+
+        public uint remoteScopeId;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public byte[] remotePort;
+
+        public ConnectionState state;
+        public int owningPid;
+
+        public IPAddress LocalAddress
+        {
+            get { return new IPAddress(localAddr, localScopeId); }
+        }
+
+        public ushort LocalPort
+        {
+            get { return (ushort)((localPort[0] << 8) | localPort[1]); }
+        }
+
+        public IPAddress RemoteAddress
+        {
+            get { return new IPAddress(remoteAddr, remoteScopeId); }
+        }
+
+        public ushort RemotePort
+        {
+            get { return (ushort)((remotePort[0] << 8) | remotePort[1]); }
+        }
+    }
+
     #endregion
 
     #region UDP结构
@@ -214,6 +324,30 @@ namespace ProcessViewer
     public struct UdpTable
     {
         public uint dwNumEntries;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Udp6Row
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public byte[] localAddr;
+
+        public uint localScopeId;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public byte[] localPort;
+
+        public int owningPid;
+
+        public IPAddress LocalAddress
+        {
+            get { return new IPAddress(localAddr, localScopeId); }
+        }
+
+        public ushort LocalPort
+        {
+            get { return (ushort)((localPort[0] << 8) | localPort[1]); }
+        }
     }
 
     #endregion
