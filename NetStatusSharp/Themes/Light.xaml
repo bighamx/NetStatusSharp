@@ -66,6 +66,7 @@
         <Setter Property="CaretBrush" Value="{StaticResource Accent}" />
         <Setter Property="BorderBrush" Value="{StaticResource Border}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="46" />
         <Setter Property="Padding" Value="10,7" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -111,6 +112,7 @@
         <Setter Property="Foreground" Value="{StaticResource Fg}" />
         <Setter Property="BorderBrush" Value="{StaticResource Border}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="46" />
         <Setter Property="Padding" Value="9,6" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource ComboItem}" />
@@ -118,22 +120,36 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
+                        <!-- 透明点击层必须在内容下方，否则默认 ToggleButton 模板会在 hover 时盖住选中文字。 -->
+                        <ToggleButton x:Name="DropDownToggle" Background="Transparent" BorderThickness="0"
+                                      Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Background="Transparent" />
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
                         <Border x:Name="ComboBorder" Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" />
-                        <Grid Margin="{TemplateBinding Padding}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="18" />
-                            </Grid.ColumnDefinitions>
-                            <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding SelectionBoxItem}" />
-                            <Path Grid.Column="1" Width="8" Height="5" HorizontalAlignment="Right"
-                                  VerticalAlignment="Center" Fill="{StaticResource FgMuted}"
-                                  Data="M 0 0 L 4 4 L 8 0 Z" />
-                        </Grid>
-                        <ToggleButton Background="Transparent" BorderThickness="0" Focusable="False"
-                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" />
-                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4"
+                                IsHitTestVisible="False">
+                            <Grid Margin="{TemplateBinding Padding}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="18" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                  IsHitTestVisible="False" />
+                                <Path Grid.Column="1" Width="8" Height="5" HorizontalAlignment="Right"
+                                      VerticalAlignment="Center" Fill="{StaticResource FgMuted}"
+                                      Data="M 0 0 L 4 4 L 8 0 Z" />
+                            </Grid>
+                        </Border>
+                        <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
                                AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
                             <Border Background="{StaticResource Bg2}" BorderBrush="{StaticResource Border}"
                                     BorderThickness="1" CornerRadius="4" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
@@ -144,6 +160,9 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource Accent}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
