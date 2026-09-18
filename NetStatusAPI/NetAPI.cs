@@ -1,5 +1,6 @@
 using System;
-using System.Linq;
+using System.ComponentModel;
+using System.Net;
 using System.Runtime.InteropServices;
 
 namespace ProcessViewer
@@ -7,6 +8,7 @@ namespace ProcessViewer
     public static class NetProcessAPI
     {
         private const int AF_INET = 2;
+        private const uint ERROR_INSUFFICIENT_BUFFER = 122;
 
         [DllImport("iphlpapi.dll", SetLastError = true)]
         private static extern uint GetExtendedTcpTable(IntPtr pTcpTable, ref int dwOutBufLen, bool sort, int ipVersion, TCP_TABLE_CLASS tblClass, uint reserved = 0);
@@ -20,7 +22,8 @@ namespace ProcessViewer
         public static TcpRow[] GetAllTcpConnections()
         {
             int buffSize = 0;
-            GetExtendedTcpTable(IntPtr.Zero, ref buffSize, true, AF_INET, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+            uint firstResult = GetExtendedTcpTable(IntPtr.Zero, ref buffSize, true, AF_INET, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
+            EnsureBufferResult(firstResult, buffSize, nameof(GetExtendedTcpTable));
 
             IntPtr buffTable = Marshal.AllocHGlobal(buffSize);
             try
@@ -28,17 +31,17 @@ namespace ProcessViewer
                 uint ret = GetExtendedTcpTable(buffTable, ref buffSize, true, AF_INET, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_ALL);
                 if (ret != 0)
                 {
-                    return new TcpRow[0];
+                    throw new Win32Exception((int)ret, "读取 TCP 连接表失败。");
                 }
 
-                TcpTable tab = (TcpTable)Marshal.PtrToStructure(buffTable, typeof(TcpTable));
-                IntPtr rowPtr = (IntPtr)(buffTable.ToInt64() + Marshal.SizeOf(typeof(uint)));
+                TcpTable tab = Marshal.PtrToStructure<TcpTable>(buffTable);
+                IntPtr rowPtr = IntPtr.Add(buffTable, sizeof(uint));
                 TcpRow[] table = new TcpRow[tab.dwNumEntries];
 
                 for (int i = 0; i < tab.dwNumEntries; i++)
                 {
-                    table[i] = (TcpRow)Marshal.PtrToStructure(rowPtr, typeof(TcpRow));
-                    rowPtr = (IntPtr)(rowPtr.ToInt64() + Marshal.SizeOf(typeof(TcpRow)));
+                    table[i] = Marshal.PtrToStructure<TcpRow>(rowPtr);
+                    rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf<TcpRow>());
                 }
 
                 return table;
@@ -53,23 +56,24 @@ namespace ProcessViewer
         {
             int buffSize = 0;
             uint ret = GetExtendedUdpTable(IntPtr.Zero, ref buffSize, true, AF_INET, UDP_TABLE_CLASS.UDP_TABLE_OWNER_PID);
+            EnsureBufferResult(ret, buffSize, nameof(GetExtendedUdpTable));
             IntPtr buffTable = Marshal.AllocHGlobal(buffSize);
             try
             {
                 ret = GetExtendedUdpTable(buffTable, ref buffSize, true, AF_INET, UDP_TABLE_CLASS.UDP_TABLE_OWNER_PID);
                 if (ret != 0)
                 {
-                    return new UdpRow[0];
+                    throw new Win32Exception((int)ret, "读取 UDP 连接表失败。");
                 }
 
-                UdpTable tab = (UdpTable)Marshal.PtrToStructure(buffTable, typeof(UdpTable));
-                IntPtr rowPtr = (IntPtr)(buffTable.ToInt64() + Marshal.SizeOf(typeof(uint)));
+                UdpTable tab = Marshal.PtrToStructure<UdpTable>(buffTable);
+                IntPtr rowPtr = IntPtr.Add(buffTable, sizeof(uint));
                 UdpRow[] table = new UdpRow[tab.dwNumEntries];
 
                 for (int i = 0; i < tab.dwNumEntries; i++)
                 {
-                    table[i] = (UdpRow)Marshal.PtrToStructure(rowPtr, typeof(UdpRow));
-                    rowPtr = (IntPtr)(rowPtr.ToInt64() + Marshal.SizeOf(typeof(UdpRow)));
+                    table[i] = Marshal.PtrToStructure<UdpRow>(rowPtr);
+                    rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf<UdpRow>());
                 }
 
                 return table;
@@ -80,33 +84,22 @@ namespace ProcessViewer
             }
         }
 
-        public static void CloseConnByLocalPort(int port)
+        private static void EnsureBufferResult(uint result, int bufferSize, string operation)
         {
-            TcpRow[] tcpRows = (from row in GetAllTcpConnections()
-                                where row.LocalPort == port
-                                select row).ToArray();
-
-            for (int i = 0; i < tcpRows.Length; i++)
+            if (bufferSize <= 0)
             {
-                tcpRows[i].state = ConnectionState.Delete_TCB;
-                IntPtr rowPointer = GetPtrToNewObject(tcpRows[i]);
+                if (result == 0)
+                {
+                    return;
+                }
 
-                try
-                {
-                    SetTcpEntry(rowPointer);
-                }
-                finally
-                {
-                    Marshal.FreeCoTaskMem(rowPointer);
-                }
+                throw new Win32Exception((int)result, operation + " 未返回有效缓冲区大小。");
             }
-        }
 
-        public static IntPtr GetPtrToNewObject(object obj)
-        {
-            IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(obj));
-            Marshal.StructureToPtr(obj, ptr, false);
-            return ptr;
+            if (result != 0 && result != ERROR_INSUFFICIENT_BUFFER)
+            {
+                throw new Win32Exception((int)result, operation + " 初始化失败。");
+            }
         }
     }
 
@@ -160,22 +153,22 @@ namespace ProcessViewer
 
         public System.Net.IPAddress LocalAddress
         {
-            get { return new System.Net.IPAddress(localAddr); }
+            get { return new IPAddress(localAddr); }
         }
 
         public ushort LocalPort
         {
-            get { return BitConverter.ToUInt16(new[] { localPort[1], localPort[0] }, 0); }
+            get { return (ushort)((localPort[0] << 8) | localPort[1]); }
         }
 
         public System.Net.IPAddress RemoteAddress
         {
-            get { return new System.Net.IPAddress(remoteAddr); }
+            get { return new IPAddress(remoteAddr); }
         }
 
         public ushort RemotePort
         {
-            get { return BitConverter.ToUInt16(new[] { remotePort[1], remotePort[0] }, 0); }
+            get { return (ushort)((remotePort[0] << 8) | remotePort[1]); }
         }
     }
 
@@ -208,12 +201,12 @@ namespace ProcessViewer
 
         public System.Net.IPAddress LocalAddress
         {
-            get { return new System.Net.IPAddress(localAddr); }
+            get { return new IPAddress(localAddr); }
         }
 
         public ushort LocalPort
         {
-            get { return BitConverter.ToUInt16(new[] { localPort[1], localPort[0] }, 0); }
+            get { return (ushort)((localPort[0] << 8) | localPort[1]); }
         }
     }
 

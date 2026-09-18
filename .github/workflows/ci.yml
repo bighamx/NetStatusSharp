@@ -15,14 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        run: nuget restore NetStatusSharp.sln
+        run: dotnet restore NetStatusSharp.sln
 
       - name: Build solution
-        run: msbuild NetStatusSharp.sln /p:Configuration=Release /p:Platform="Any CPU"
+        run: dotnet build NetStatusSharp.sln --configuration Release --no-restore

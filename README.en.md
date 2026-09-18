@@ -2,47 +2,57 @@
 
 [中文说明](README.md)
 
-NetStatusSharp is a Windows Forms desktop utility for inspecting TCP and UDP connections opened by local processes on Windows.
+NetStatusSharp is a lightweight Windows network connection monitor for inspecting and filtering local IPv4 TCP and UDP connections by process.
 
-It lists active connections, shows the owning process, and provides a lightweight UI for filtering and refreshing results.
+![NetStatusSharp light interface](docs/screenshot.png)
 
 ## Features
 
-- View current TCP and UDP connections on Windows
+- View process name, PID, local endpoint, remote endpoint, and TCP state
 - Filter by process name, PID, local port, remote port, protocol, and TCP state
-- Show process name together with the executable icon
-- Refresh the connection list on demand from the desktop UI
+- Light, high-DPI WPF interface with row virtualization, column sorting, and multi-row copy
+- Asynchronous, cancellable refreshes that keep the interface responsive
+- Resolve each PID only once per refresh and filter connections before loading process metadata
+- Optional five-second automatic refresh with result count, duration, and update time
 
-## Solution Layout
+## Keyboard shortcuts
 
-- `NetStatusSharp/`: WinForms application and filtering UI
-- `NetStatusAPI/`: low-level wrapper for connection enumeration and process metadata lookup
-- `NetStatusSharp.sln`: Visual Studio solution file
+- `F5`: refresh
+- `Enter`: apply text-box filters
+- `Esc`: cancel the active refresh
+- `Ctrl+L`: clear filters
+- `Ctrl+C`: copy selected connections
 
-## Technical Details
+## Solution layout
 
-- Target framework: `.NET Framework 4.8`
-- UI: `Windows Forms`
+- `NetStatusSharp/`: .NET 8 WPF application, MVVM, theme, and connection query service
+- `NetStatusAPI/`: wrapper for the native Windows TCP and UDP connection tables
+- `NetStatusSharp.sln`: Visual Studio solution
+
+## Technical details
+
+- Target framework: `.NET 8 (net8.0-windows)`
+- UI: `WPF`
 - Native APIs: `GetExtendedTcpTable` and `GetExtendedUdpTable`
-- Platform: `Windows only`
+- Current connection scope: IPv4
+- Platform: Windows 10 or later
 
-## Build
+## Build and run
 
-Open `NetStatusSharp.sln` in Visual Studio and build the solution.
-
-Command line example:
+Use Visual Studio 2022 with the .NET desktop development workload or the .NET 8 SDK.
 
 ```powershell
-msbuild .\NetStatusSharp.sln /p:Configuration=Release
+dotnet build .\NetStatusSharp.sln -c Release
+dotnet run --project .\NetStatusSharp\NetStatusSharp.csproj -c Release
 ```
 
-## Run
+The regular build requires the .NET 8 Desktop Runtime. To create a self-contained single-file build:
 
-After building, start:
-
-```text
-NetStatusSharp\bin\Release\NetStatusSharp.exe
+```powershell
+dotnet publish .\NetStatusSharp\NetStatusSharp.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 ```
+
+The GitHub Release workflow automatically creates a self-contained `win-x64` archive.
 
 ## License
 

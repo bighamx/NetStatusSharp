@@ -16,17 +16,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v2
-
-      - name: Restore dependencies
-        run: nuget restore NetStatusSharp.sln
-
-      - name: Build solution
-        run: msbuild NetStatusSharp.sln /p:Configuration=Release /p:Platform="Any CPU"
+      - name: Publish self-contained application
+        run: >-
+          dotnet publish NetStatusSharp/NetStatusSharp.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=None
+          --output publish/win-x64
 
       - name: Package release files
         shell: pwsh
@@ -34,18 +38,8 @@ jobs:
           $tag = "${{ github.ref_name }}"
           $staging = Join-Path $env:RUNNER_TEMP "NetStatusSharp-$tag"
           $asset = Join-Path $env:RUNNER_TEMP "NetStatusSharp-$tag.zip"
-          $releaseDir = "NetStatusSharp\bin\Release"
-          $filesToInclude = @(
-            "NetStatusSharp.exe",
-            "NetStatusSharp.exe.config",
-            "NetStatusSharp.exe.manifest",
-            "NetStatusAPI.dll"
-          )
-          $requiredFiles = @(
-            "NetStatusSharp.exe",
-            "NetStatusSharp.exe.config",
-            "NetStatusAPI.dll"
-          )
+          $releaseDir = "publish\win-x64"
+          $requiredFiles = @("NetStatusSharp.exe")
 
           New-Item -ItemType Directory -Force -Path $staging | Out-Null
 
@@ -56,12 +50,7 @@ jobs:
             }
           }
 
-          foreach ($file in $filesToInclude) {
-            $path = Join-Path $releaseDir $file
-            if (Test-Path $path) {
-              Copy-Item -Path $path -Destination $staging -Force
-            }
-          }
+          Copy-Item -Path (Join-Path $releaseDir "*") -Destination $staging -Recurse -Force
 
           if (Test-Path $asset) {
             Remove-Item -LiteralPath $asset -Force

@@ -2,58 +2,58 @@
 
 [English README](README.en.md)
 
-NetStatusSharp 是一个基于 Windows Forms 的网络连接查看工具，用于分析当前机器上各个进程占用的 TCP / UDP 连接情况。
+NetStatusSharp 是一个面向 Windows 的轻量网络连接监视器，用于按进程查看和筛选本机 IPv4 TCP / UDP 连接。
 
-它可以列出本机连接、显示连接所属进程，并通过桌面界面快速进行筛选和刷新。
+![NetStatusSharp 浅色界面](docs/screenshot.png)
 
 ## 功能特性
 
-- 查看当前 Windows 系统中的 TCP 和 UDP 连接
-- 按进程名、PID、本地端口、远程端口、协议、TCP 状态进行筛选
-- 显示进程名称和对应图标
-- 在桌面界面中一键刷新连接列表
+- 查看连接所属进程、PID、本地端点、远程端点和 TCP 状态
+- 按进程名、PID、本地端口、远程端口、协议及 TCP 状态筛选
+- 浅色高 DPI WPF 界面，支持表格虚拟化、列排序和多行复制
+- 异步采集连接，刷新期间界面保持响应并可随时取消
+- 同一 PID 每轮只解析一次进程信息，先过滤连接再读取进程与图标
+- 可选每 5 秒自动刷新，底部显示连接数量、耗时和更新时间
+
+## 快捷键
+
+- `F5`：刷新
+- `Enter`：应用文本框中的筛选条件
+- `Esc`：取消当前刷新
+- `Ctrl+L`：清空筛选
+- `Ctrl+C`：复制表格中选中的连接
 
 ## 项目结构
 
-- `NetStatusSharp/`：WinForms 主程序与筛选界面
-- `NetStatusAPI/`：底层网络连接枚举与进程信息读取封装
-- `NetStatusSharp.sln`：Visual Studio 解决方案文件
+- `NetStatusSharp/`：.NET 8 WPF 应用、MVVM、主题和连接查询服务
+- `NetStatusAPI/`：Windows 原生 TCP / UDP 连接表封装
+- `NetStatusSharp.sln`：Visual Studio 解决方案
 
 ## 技术说明
 
-- 目标框架：`.NET Framework 4.8`
-- UI：`Windows Forms`
-- 底层能力：调用 Windows 原生 API `GetExtendedTcpTable`、`GetExtendedUdpTable`
-- 运行平台：`仅支持 Windows`
+- 目标框架：`.NET 8 (net8.0-windows)`
+- UI：`WPF`
+- 原生 API：`GetExtendedTcpTable`、`GetExtendedUdpTable`
+- 当前连接范围：IPv4
+- 运行平台：Windows 10 或更高版本
 
-## 构建方式
+## 构建和运行
 
-使用 Visual Studio 打开 `NetStatusSharp.sln` 后直接编译即可。
-
-命令行示例：
+需要 Visual Studio 2022（含 .NET 桌面开发工作负载）或 .NET 8 SDK。
 
 ```powershell
-msbuild .\NetStatusSharp.sln /p:Configuration=Release
+dotnet build .\NetStatusSharp.sln -c Release
+dotnet run --project .\NetStatusSharp\NetStatusSharp.csproj -c Release
 ```
 
-## 运行方式
+常规构建依赖已安装的 .NET 8 Desktop Runtime。需要无需安装运行时的单文件版本时，可执行：
 
-编译完成后，可运行：
-
-```text
-NetStatusSharp\bin\Release\NetStatusSharp.exe
+```powershell
+dotnet publish .\NetStatusSharp\NetStatusSharp.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 ```
 
-主界面支持以下筛选项：
-
-- 进程名
-- PID
-- 本地端口
-- 远程 TCP 端口
-- 协议
-- TCP 状态
+GitHub Release 工作流会自动生成 `win-x64` 自包含压缩包。
 
 ## 许可证
 
 本项目采用 [Selective Freedom License (SFL) v1.0](https://github.com/bighamx/MIT-NoHuawei) 授权，详见 [LICENSE](LICENSE)。
-
